@@ -54,28 +54,14 @@ export const LoginCard: React.FC = () => {
         </div>
 
         {/* Heading & Subtitle */}
-        <div className="mb-5">
+        <div className="mb-6">
           <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded text-[11px] font-semibold mb-2 bg-[#147A52]/10 text-[#147A52] border border-[#147A52]/20">
             <User className="w-3 h-3 text-[#147A52]" /> Personal &amp; Private Wealth Client Enclave
           </div>
           <h1 className="login-heading">Client Sign In</h1>
-          <p className="login-subtitle mb-2">
-            Enter your Account Number and password to access your accounts. Non-existent account numbers are strictly blocked by bank ledger security.
+          <p className="login-subtitle mb-0">
+            Enter your Account Number and password to access your accounts, transfer funds, manage cards, and download statements.
           </p>
-
-          <div className="p-2.5 rounded-xl bg-slate-100 border border-[#D8DEE8] text-[11px] text-[#5F6670] flex items-center justify-between font-mono">
-            <span>Client Acc #: <strong className="text-[#0B1F6A]">882049102741</strong> (<strong className="text-[#0B1F6A]">angelina.jolie</strong>)</span>
-            <button
-              type="button"
-              onClick={() => {
-                setAccountNumber('882049102741');
-                setPassword('password123');
-              }}
-              className="text-[#147A52] font-sans font-bold hover:underline cursor-pointer"
-            >
-              Autofill Credentials
-            </button>
-          </div>
         </div>
 
         {/* Error Notification */}

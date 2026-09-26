@@ -201,7 +201,7 @@ export const AdminRolesPermissionsView: React.FC = () => {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
           <div>
             <span className="font-bold text-xs text-[#0B1F6A] flex items-center gap-1.5 uppercase tracking-wider font-mono">
-              <Sparkles className="w-3.5 h-3.5 text-[#147A52]" /> Live Session Role Impersonation &amp; Clearance Testing
+              <Sparkles className="w-3.5 h-3.5 text-[#147A52]" /> Live Session Role Impersonation &amp; Clearance Controls
             </span>
             <p className="text-[11px] text-[#5F6670] mt-0.5">
               Simulate how the portal restricts features and denies access under different roles in real-time.

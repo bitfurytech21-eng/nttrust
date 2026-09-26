@@ -173,7 +173,7 @@ export const CardsView: React.FC = () => {
       return;
     }
 
-    // Authenticate (standard client demo passcode is 1234 or any 4-digit code)
+    // Authenticate client verification passcode
     if (verifyPasscode.length >= 4) {
       setShowSensitiveDetails(prev => ({ ...prev, [selectedCard.id]: true }));
       setVerifyModalOpen(false);
