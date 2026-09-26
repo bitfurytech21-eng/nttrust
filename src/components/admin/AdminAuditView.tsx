@@ -13,6 +13,7 @@ import {
   X
 } from 'lucide-react';
 import { SqlAdminAuditLog } from '../../types/banking';
+import { ExportPrintSecurityModal } from '../common/ExportPrintSecurityModal';
 
 export const AdminAuditView: React.FC = () => {
   const {
@@ -28,6 +29,19 @@ export const AdminAuditView: React.FC = () => {
   const [riskFilter, setRiskFilter] = useState<string>('all');
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [selectedSqlLog, setSelectedSqlLog] = useState<SqlAdminAuditLog | null>(null);
+
+  // Security Modal state for Export & Print Protection
+  const [secModalOpen, setSecModalOpen] = useState(false);
+  const [pendingSecAction, setPendingSecAction] = useState<{
+    fn: () => void;
+    title: string;
+    type: 'export' | 'print' | 'download';
+  } | null>(null);
+
+  const triggerProtectedAction = (fn: () => void, title: string, type: 'export' | 'print' | 'download' = 'export') => {
+    setPendingSecAction({ fn, title, type });
+    setSecModalOpen(true);
+  };
 
   // Trigger automated SQL audit view logging on component mount
   useEffect(() => {
@@ -73,48 +87,52 @@ export const AdminAuditView: React.FC = () => {
   });
 
   const handleExportSqlCsv = () => {
-    const headers = ['ID', 'Timestamp', 'Admin User ID', 'Admin Name', 'Action', 'Target Entity', 'Target ID', 'Specific Fields Changed', 'Details', 'Status'];
-    const rows = filteredSqlLogs.map((l) => [
-      l.id,
-      l.timestamp,
-      `"${l.adminUserId}"`,
-      `"${l.adminUsername}"`,
-      `"${l.action}"`,
-      `"${l.targetEntityType}"`,
-      `"${l.targetEntityId}"`,
-      `"${JSON.stringify(l.fieldsChanged || {}).replace(/"/g, '""')}"`,
-      `"${l.details.replace(/"/g, '""')}"`,
-      l.executionStatus
-    ]);
-    const csvContent = 'data:text/csv;charset=utf-8,' + [headers.join(','), ...rows.map((e) => e.join(','))].join('\n');
-    const encodedUri = encodeURI(csvContent);
-    const link = document.createElement('a');
-    link.setAttribute('href', encodedUri);
-    link.setAttribute('download', `Northern_Trust_External_SQL_Audit_Ledger_${new Date().toISOString().slice(0, 10)}.csv`);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    triggerProtectedAction(() => {
+      const headers = ['ID', 'Timestamp', 'Admin User ID', 'Admin Name', 'Action', 'Target Entity', 'Target ID', 'Specific Fields Changed', 'Details', 'Status'];
+      const rows = filteredSqlLogs.map((l) => [
+        l.id,
+        l.timestamp,
+        `"${l.adminUserId}"`,
+        `"${l.adminUsername}"`,
+        `"${l.action}"`,
+        `"${l.targetEntityType}"`,
+        `"${l.targetEntityId}"`,
+        `"${JSON.stringify(l.fieldsChanged || {}).replace(/"/g, '""')}"`,
+        `"${l.details.replace(/"/g, '""')}"`,
+        l.executionStatus
+      ]);
+      const csvContent = 'data:text/csv;charset=utf-8,' + [headers.join(','), ...rows.map((e) => e.join(','))].join('\n');
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement('a');
+      link.setAttribute('href', encodedUri);
+      link.setAttribute('download', `Northern_Trust_External_SQL_Audit_Ledger_${new Date().toISOString().slice(0, 10)}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }, 'Export External SQL Audit Ledger CSV', 'export');
   };
 
   const handleExportTelemetryCsv = () => {
-    const headers = ['Timestamp', 'Action', 'Device', 'IP', 'Location', 'Status', 'RiskScore'];
-    const rows = filteredTelemetry.map((l) => [
-      l.timestamp,
-      `"${l.action || l.event}"`,
-      `"${l.device}"`,
-      l.ip || l.ipAddress,
-      `"${l.location}"`,
-      l.status,
-      l.riskScore || (l.threatScore > 50 ? 'HIGH' : 'LOW')
-    ]);
-    const csvContent = 'data:text/csv;charset=utf-8,' + [headers.join(','), ...rows.map((e) => e.join(','))].join('\n');
-    const encodedUri = encodeURI(csvContent);
-    const link = document.createElement('a');
-    link.setAttribute('href', encodedUri);
-    link.setAttribute('download', `Northern_Trust_SIEM_Telemetry_${new Date().toISOString().slice(0, 10)}.csv`);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    triggerProtectedAction(() => {
+      const headers = ['Timestamp', 'Action', 'Device', 'IP', 'Location', 'Status', 'RiskScore'];
+      const rows = filteredTelemetry.map((l) => [
+        l.timestamp,
+        `"${l.action || l.event}"`,
+        `"${l.device}"`,
+        l.ip || l.ipAddress,
+        `"${l.location}"`,
+        l.status,
+        l.riskScore || (l.threatScore > 50 ? 'HIGH' : 'LOW')
+      ]);
+      const csvContent = 'data:text/csv;charset=utf-8,' + [headers.join(','), ...rows.map((e) => e.join(','))].join('\n');
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement('a');
+      link.setAttribute('href', encodedUri);
+      link.setAttribute('download', `Northern_Trust_SIEM_Telemetry_${new Date().toISOString().slice(0, 10)}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }, 'Export SIEM Telemetry Audit CSV', 'export');
   };
 
   const renderFieldDiffBadges = (fieldsChanged: Record<string, any>) => {
@@ -521,6 +539,23 @@ export const AdminAuditView: React.FC = () => {
           </div>
         </div>
       )}
+
+      <ExportPrintSecurityModal
+        isOpen={secModalOpen}
+        onClose={() => {
+          setSecModalOpen(false);
+          setPendingSecAction(null);
+        }}
+        onAuthorized={() => {
+          if (pendingSecAction) {
+            pendingSecAction.fn();
+          }
+          setSecModalOpen(false);
+          setPendingSecAction(null);
+        }}
+        actionTitle={pendingSecAction?.title}
+        actionType={pendingSecAction?.type}
+      />
     </div>
   );
 };

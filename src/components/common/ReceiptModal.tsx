@@ -18,6 +18,7 @@ import {
 import { Transaction, TransferRequest } from '../../types/banking';
 import { useBanking } from '../../context/BankingContext';
 import { NorthernTrustLogo } from './NorthernTrustLogo';
+import { ExportPrintSecurityModal } from './ExportPrintSecurityModal';
 
 interface Props {
   isOpen: boolean;
@@ -31,6 +32,19 @@ export const ReceiptModal: React.FC<Props> = ({ isOpen, onClose, transaction, tr
   const [adviceViewMode, setAdviceViewMode] = useState<'standard' | 'regulatory'>('standard');
   const [copied, setCopied] = useState(false);
   const [isPreparingAdvice, setIsGeneratingPdf] = useState(false);
+
+  // Security Modal state for Export & Print Protection
+  const [secModalOpen, setSecModalOpen] = useState(false);
+  const [pendingSecAction, setPendingSecAction] = useState<{
+    fn: () => void;
+    title: string;
+    type: 'export' | 'print' | 'download';
+  } | null>(null);
+
+  const triggerProtectedAction = (fn: () => void, title: string, type: 'export' | 'print' | 'download' = 'export') => {
+    setPendingSecAction({ fn, title, type });
+    setSecModalOpen(true);
+  };
 
   if (!isOpen || (!transaction && !transfer)) return null;
 
@@ -56,13 +70,16 @@ export const ReceiptModal: React.FC<Props> = ({ isOpen, onClose, transaction, tr
   };
 
   const handlePrint = () => {
-    window.print();
+    triggerProtectedAction(() => {
+      window.print();
+    }, 'Print Settlement Receipt / Advice Voucher', 'print');
   };
 
   const handleDownloadAdvice = () => {
-    setIsGeneratingPdf(true);
-    setTimeout(() => {
-      const adviceContent = `================================================================================
+    triggerProtectedAction(() => {
+      setIsGeneratingPdf(true);
+      setTimeout(() => {
+        const adviceContent = `================================================================================
 NORTHERN TRUST PRIVATE WEALTH & INSTITUTIONAL BANKING
 OFFICIAL TRANSACTION ADVICE & SETTLEMENT CERTIFICATE
 ================================================================================
@@ -94,17 +111,18 @@ Northern Trust, NA • Member FDIC • Equal Housing Lender
 50 South LaSalle Street, Chicago, IL 60603
 ================================================================================`;
 
-      const blob = new Blob([adviceContent], { type: 'text/plain;charset=utf-8' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `NorthernTrust_Advice_${refCode}.txt`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-      setIsGeneratingPdf(false);
-    }, 600);
+        const blob = new Blob([adviceContent], { type: 'text/plain;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `NorthernTrust_Advice_${refCode}.txt`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        setIsGeneratingPdf(false);
+      }, 600);
+    }, 'Export Official Settlement Advice Text File', 'download');
   };
 
   return (
@@ -323,6 +341,23 @@ Northern Trust, NA • Member FDIC • Equal Housing Lender
           </button>
         </div>
       </div>
+
+      <ExportPrintSecurityModal
+        isOpen={secModalOpen}
+        onClose={() => {
+          setSecModalOpen(false);
+          setPendingSecAction(null);
+        }}
+        onAuthorized={() => {
+          if (pendingSecAction) {
+            pendingSecAction.fn();
+          }
+          setSecModalOpen(false);
+          setPendingSecAction(null);
+        }}
+        actionTitle={pendingSecAction?.title}
+        actionType={pendingSecAction?.type}
+      />
     </div>
   );
 };

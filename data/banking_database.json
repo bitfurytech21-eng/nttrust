@@ -28,8 +28,8 @@
       "name": "Julian Cavendish Private Treasury",
       "type": "checking",
       "currency": "USD",
-      "balance": 750000,
-      "availableBalance": 750000,
+      "balance": 707900,
+      "availableBalance": 707900,
       "pendingBalance": 0,
       "interestRateAPY": 1.25,
       "monthlyLimit": 5000000,
@@ -125,6 +125,20 @@
     }
   ],
   "transactions": [
+    {
+      "id": "tx_bill_1790437009073",
+      "accountId": "acc_1790412398819_cnc",
+      "accountName": "Julian Cavendish Private Treasury",
+      "amount": -42100,
+      "type": "bill_payment",
+      "category": "Utilities",
+      "counterparty": "Los Feliz Historic Estate Management & Security",
+      "description": "Electronic Payment: Los Feliz Historic Estate Management & Security (ACCT-LF-ESTATE-99)",
+      "timestamp": "2026-09-26 15:36:49",
+      "status": "completed",
+      "referenceNumber": "BIL-009073",
+      "currency": "USD"
+    },
     {
       "id": "tx_init_1790412402234",
       "accountId": "acc_1790412402234_nyw",
@@ -833,9 +847,9 @@
       "amount": 42100,
       "dueDate": "2026-10-01",
       "autoPayEnabled": true,
-      "status": "scheduled",
-      "lastPaidDate": "2026-09-15",
-      "confirmationCode": "LF-AUTOPAY-2026-09"
+      "status": "paid",
+      "lastPaidDate": "2026-09-26",
+      "confirmationCode": "ACH-3LVK5J"
     },
     {
       "id": "bill_02",
@@ -1526,5 +1540,110 @@
       "failedLoginAttempts": 0
     }
   ],
-  "lastUpdated": "2026-09-26T08:54:46.876Z"
+  "lastUpdated": "2026-09-26T15:36:49.073Z",
+  "roles": [
+    {
+      "id": "admin",
+      "name": "Super Admin / Operations Lead",
+      "description": "Full supervisory authority across all accounts, ledgers, and compliance desks.",
+      "isSystem": true,
+      "defaultPermissions": [
+        "full_access"
+      ]
+    },
+    {
+      "id": "compliance_officer",
+      "name": "Compliance & AML Officer",
+      "description": "Manages KYC verification, customer identity audits, and regulatory SIEM logs.",
+      "isSystem": true,
+      "defaultPermissions": [
+        "view:dashboard",
+        "view:accounts",
+        "view:transactions",
+        "view:transfers",
+        "view:documents",
+        "view:audit_logs",
+        "view:customers",
+        "edit:customers",
+        "manage:kyc",
+        "manage:users",
+        "manage:roles"
+      ]
+    },
+    {
+      "id": "auditor",
+      "name": "Independent Regulatory Auditor",
+      "description": "Strict read-only oversight across all client portfolios, records, and SIEM logs.",
+      "isSystem": true,
+      "defaultPermissions": [
+        "view:dashboard",
+        "view:accounts",
+        "view:transactions",
+        "view:transfers",
+        "view:cards",
+        "view:documents",
+        "view:audit_logs",
+        "view:customers"
+      ]
+    },
+    {
+      "id": "treasury_manager",
+      "name": "Institutional Treasury Manager",
+      "description": "Oversees liquidity reserves, wires, ledger adjustments, and depository vaults.",
+      "isSystem": true,
+      "defaultPermissions": [
+        "view:dashboard",
+        "view:accounts",
+        "view:transactions",
+        "view:transfers",
+        "create:transfers",
+        "create:accounts",
+        "edit:accounts",
+        "manage:ledger",
+        "view:audit_logs"
+      ]
+    },
+    {
+      "id": "client",
+      "name": "Private Wealth Client",
+      "description": "Full individual client capabilities: accounts, transfers, cards, statements.",
+      "isSystem": true,
+      "defaultPermissions": [
+        "view:dashboard",
+        "view:accounts",
+        "view:transactions",
+        "view:transfers",
+        "view:cards",
+        "view:documents",
+        "view:messages",
+        "view:notifications",
+        "view:profile",
+        "create:transfers",
+        "create:transactions",
+        "create:messages",
+        "create:beneficiaries",
+        "create:cards",
+        "edit:profile",
+        "edit:accounts",
+        "edit:cards",
+        "edit:security",
+        "delete:beneficiaries",
+        "delete:notifications",
+        "delete:records"
+      ]
+    },
+    {
+      "id": "restricted_client",
+      "name": "Restricted Read-Only Client",
+      "description": "View-only access for family beneficiaries or trustees; cannot initiate transfers or edit settings.",
+      "isSystem": true,
+      "defaultPermissions": [
+        "view:dashboard",
+        "view:accounts",
+        "view:transactions",
+        "view:documents",
+        "view:profile"
+      ]
+    }
+  ]
 }

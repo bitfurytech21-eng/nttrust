@@ -23,6 +23,7 @@ import { Transaction } from '../../types/banking';
 import { ReceiptModal } from '../common/ReceiptModal';
 import { DisputeModal } from '../common/DisputeModal';
 import { StatementTaxModal } from './StatementTaxModal';
+import { ExportPrintSecurityModal } from '../common/ExportPrintSecurityModal';
 import {
   exportTransactionsToCSV,
   exportTransactionsToPDF,
@@ -42,6 +43,19 @@ export const TransactionsView: React.FC = () => {
   const [isStatementModalOpen, setIsStatementModalOpen] = useState(false);
   const [statementModalType, setStatementModalType] = useState<'statement' | 'tax_1099_int' | 'tax_1099_b' | 'proof_of_funds'>('statement');
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+
+  // Security Modal state for Export & Print Protection
+  const [secModalOpen, setSecModalOpen] = useState(false);
+  const [pendingSecAction, setPendingSecAction] = useState<{
+    fn: () => void;
+    title: string;
+    type: 'export' | 'print' | 'download';
+  } | null>(null);
+
+  const triggerProtectedAction = (fn: () => void, title: string, type: 'export' | 'print' | 'download' = 'export') => {
+    setPendingSecAction({ fn, title, type });
+    setSecModalOpen(true);
+  };
 
   const showToast = (msg: string) => {
     setToastMessage(msg);
@@ -73,31 +87,37 @@ export const TransactionsView: React.FC = () => {
 
   // Direct CSV Export
   const handleExportCSV = () => {
-    exportTransactionsToCSV(
-      filteredTransactions,
-      'Northern_Trust_Transactions',
-      yearFilter === 'all' ? '2023_2026_All' : yearFilter
-    );
-    showToast(`Exported ${filteredTransactions.length} transactions to CSV.`);
+    triggerProtectedAction(() => {
+      exportTransactionsToCSV(
+        filteredTransactions,
+        'Northern_Trust_Transactions',
+        yearFilter === 'all' ? '2023_2026_All' : yearFilter
+      );
+      showToast(`Exported ${filteredTransactions.length} transactions to CSV.`);
+    }, 'Export Transaction Records to CSV', 'export');
   };
 
   // Direct PDF Export
   const handleExportPDF = () => {
-    const selectedAcc = accounts.find(a => a.id === accountFilter) || null;
-    exportTransactionsToPDF(filteredTransactions, {
-      account: selectedAcc,
-      currentUser,
-      yearFilter,
-      typeFilter
-    });
-    showToast(`Downloaded Official Transaction Audit PDF (${filteredTransactions.length} records).`);
+    triggerProtectedAction(() => {
+      const selectedAcc = accounts.find(a => a.id === accountFilter) || null;
+      exportTransactionsToPDF(filteredTransactions, {
+        account: selectedAcc,
+        currentUser,
+        yearFilter,
+        typeFilter
+      });
+      showToast(`Downloaded Official Transaction Audit PDF (${filteredTransactions.length} records).`);
+    }, 'Download Official PDF Audit Ledger', 'download');
   };
 
   // Tax Schedule Export
   const handleExportTaxSchedule = () => {
-    const targetTaxYear = yearFilter === 'all' ? '2025' : yearFilter;
-    exportTaxSummaryCSV(targetTaxYear, accounts, transactions);
-    showToast(`Exported Annual Tax Schedule CSV for ${targetTaxYear}.`);
+    triggerProtectedAction(() => {
+      const targetTaxYear = yearFilter === 'all' ? '2025' : yearFilter;
+      exportTaxSummaryCSV(targetTaxYear, accounts, transactions);
+      showToast(`Exported Annual Tax Schedule CSV for ${targetTaxYear}.`);
+    }, 'Export Annual Tax Schedule CSV', 'export');
   };
 
   return (
@@ -443,6 +463,22 @@ export const TransactionsView: React.FC = () => {
         isOpen={isStatementModalOpen}
         onClose={() => setIsStatementModalOpen(false)}
         initialType={statementModalType}
+      />
+      <ExportPrintSecurityModal
+        isOpen={secModalOpen}
+        onClose={() => {
+          setSecModalOpen(false);
+          setPendingSecAction(null);
+        }}
+        onAuthorized={() => {
+          if (pendingSecAction) {
+            pendingSecAction.fn();
+          }
+          setSecModalOpen(false);
+          setPendingSecAction(null);
+        }}
+        actionTitle={pendingSecAction?.title}
+        actionType={pendingSecAction?.type}
       />
     </div>
   );

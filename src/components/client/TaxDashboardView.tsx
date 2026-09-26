@@ -27,6 +27,7 @@ import {
 } from 'lucide-react';
 import { BankDocument } from '../../types/banking';
 import { StatementTaxModal } from './StatementTaxModal';
+import { ExportPrintSecurityModal } from '../common/ExportPrintSecurityModal';
 import { IrsLogo } from '../common/IrsLogo';
 import { TaxDeadlineNotificationBadge } from './TaxDeadlineNotificationBadge';
 import {
@@ -53,6 +54,19 @@ export const TaxDashboardView: React.FC = () => {
   const [modalYear, setModalYear] = useState<string>('2025');
   const [cpaSentSuccess, setCpaSentSuccess] = useState(false);
   const [isSendingToCpa, setIsSendingToCpa] = useState(false);
+
+  // Security Modal state for Export & Print Protection
+  const [secModalOpen, setSecModalOpen] = useState(false);
+  const [pendingSecAction, setPendingSecAction] = useState<{
+    fn: () => void;
+    title: string;
+    type: 'export' | 'print' | 'download';
+  } | null>(null);
+
+  const triggerProtectedAction = (fn: () => void, title: string, type: 'export' | 'print' | 'download' = 'export') => {
+    setPendingSecAction({ fn, title, type });
+    setSecModalOpen(true);
+  };
 
   // Filter only tax-related documents
   const taxDocuments = useMemo(() => {
@@ -245,16 +259,18 @@ export const TaxDashboardView: React.FC = () => {
   };
 
   const handleDownloadAllYearBundle = () => {
-    const filename = `Tax_Year_Certified_Bundle_${selectedYear === 'all' ? '2023_2025' : selectedYear}.zip`;
-    const taxPackageBlob = new Blob([`Northern Trust Certified Tax Filing Package - Client: Account Holder (${annualMetrics.year})`], { type: 'text/plain' });
-    const url = URL.createObjectURL(taxPackageBlob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = filename;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
+    triggerProtectedAction(() => {
+      const filename = `Tax_Year_Certified_Bundle_${selectedYear === 'all' ? '2023_2025' : selectedYear}.zip`;
+      const taxPackageBlob = new Blob([`Northern Trust Certified Tax Filing Package - Client: Account Holder (${annualMetrics.year})`], { type: 'text/plain' });
+      const url = URL.createObjectURL(taxPackageBlob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }, 'Download Annual Certified Tax Package Bundle', 'download');
   };
 
   return (
@@ -815,6 +831,23 @@ export const TaxDashboardView: React.FC = () => {
         onClose={() => setShowTaxModal(false)}
         initialType={modalType}
         autoStartDownload={false}
+      />
+
+      <ExportPrintSecurityModal
+        isOpen={secModalOpen}
+        onClose={() => {
+          setSecModalOpen(false);
+          setPendingSecAction(null);
+        }}
+        onAuthorized={() => {
+          if (pendingSecAction) {
+            pendingSecAction.fn();
+          }
+          setSecModalOpen(false);
+          setPendingSecAction(null);
+        }}
+        actionTitle={pendingSecAction?.title}
+        actionType={pendingSecAction?.type}
       />
     </div>
   );

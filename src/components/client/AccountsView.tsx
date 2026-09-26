@@ -26,6 +26,7 @@ import {
 } from 'lucide-react';
 import { BankAccount } from '../../types/banking';
 import { StatementTaxModal } from './StatementTaxModal';
+import { ExportPrintSecurityModal } from '../common/ExportPrintSecurityModal';
 import {
   exportAccountsToCSV,
   exportTransactionsToCSV,
@@ -52,6 +53,19 @@ export const AccountsView: React.FC = () => {
   const [modalType, setModalType] = useState<'statement' | 'tax_1099_int' | 'tax_1099_b' | 'proof_of_funds'>('statement');
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
+  // Security Modal state for Export & Print Protection
+  const [secModalOpen, setSecModalOpen] = useState(false);
+  const [pendingSecAction, setPendingSecAction] = useState<{
+    fn: () => void;
+    title: string;
+    type: 'export' | 'print' | 'download';
+  } | null>(null);
+
+  const triggerProtectedAction = (fn: () => void, title: string, type: 'export' | 'print' | 'download' = 'export') => {
+    setPendingSecAction({ fn, title, type });
+    setSecModalOpen(true);
+  };
+
   const showToast = (msg: string) => {
     setToastMessage(msg);
     setTimeout(() => setToastMessage(null), 3500);
@@ -77,8 +91,10 @@ export const AccountsView: React.FC = () => {
       triggerAccessDenied('view:documents', 'Export Portfolio Accounts CSV');
       return;
     }
-    exportAccountsToCSV(accounts, currentUser);
-    showToast('Accounts Portfolio CSV exported successfully.');
+    triggerProtectedAction(() => {
+      exportAccountsToCSV(accounts, currentUser);
+      showToast('Accounts Portfolio CSV exported successfully.');
+    }, 'Export Accounts Portfolio CSV', 'export');
   };
 
   const handleExportSelectedAccountCSV = (acc: BankAccount) => {
@@ -86,9 +102,11 @@ export const AccountsView: React.FC = () => {
       triggerAccessDenied('view:documents', 'Download Ledger CSV');
       return;
     }
-    const accTxs = transactions.filter(t => t.accountId === acc.id);
-    exportTransactionsToCSV(accTxs, `Northern_Trust_${acc.name.replace(/\s+/g, '_')}`, 'Account_Ledger');
-    showToast(`Ledger CSV for ${acc.name} downloaded.`);
+    triggerProtectedAction(() => {
+      const accTxs = transactions.filter(t => t.accountId === acc.id);
+      exportTransactionsToCSV(accTxs, `Northern_Trust_${acc.name.replace(/\s+/g, '_')}`, 'Account_Ledger');
+      showToast(`Ledger CSV for ${acc.name} downloaded.`);
+    }, `Download Ledger CSV (${acc.name})`, 'download');
   };
 
   const handleExportSelectedAccountPDF = (acc: BankAccount) => {
@@ -96,9 +114,11 @@ export const AccountsView: React.FC = () => {
       triggerAccessDenied('view:documents', 'Generate Official Statement PDF');
       return;
     }
-    const accTxs = transactions.filter(t => t.accountId === acc.id);
-    exportOfficialStatementPDF(acc, accTxs, currentUser, 'Monthly Cycle #09-2026');
-    showToast(`Official PDF Statement for ${acc.name} generated & downloaded.`);
+    triggerProtectedAction(() => {
+      const accTxs = transactions.filter(t => t.accountId === acc.id);
+      exportOfficialStatementPDF(acc, accTxs, currentUser, 'Monthly Cycle #09-2026');
+      showToast(`Official PDF Statement for ${acc.name} generated & downloaded.`);
+    }, `Generate Statement PDF (${acc.name})`, 'download');
   };
 
   const handleExportTaxForm = (acc: BankAccount, formType: '1099-INT' | '1099-B' = '1099-INT') => {
@@ -106,8 +126,10 @@ export const AccountsView: React.FC = () => {
       triggerAccessDenied('view:documents', `IRS Form ${formType}`);
       return;
     }
-    exportTaxFormPDF(formType, '2025', acc, currentUser);
-    showToast(`IRS Form ${formType} (2025) PDF generated.`);
+    triggerProtectedAction(() => {
+      exportTaxFormPDF(formType, '2025', acc, currentUser);
+      showToast(`IRS Form ${formType} (2025) PDF generated.`);
+    }, `Export IRS Form ${formType} PDF`, 'download');
   };
 
   return (
@@ -487,6 +509,23 @@ export const AccountsView: React.FC = () => {
           initialAccountId={selectedAccount.id}
         />
       )}
+
+      <ExportPrintSecurityModal
+        isOpen={secModalOpen}
+        onClose={() => {
+          setSecModalOpen(false);
+          setPendingSecAction(null);
+        }}
+        onAuthorized={() => {
+          if (pendingSecAction) {
+            pendingSecAction.fn();
+          }
+          setSecModalOpen(false);
+          setPendingSecAction(null);
+        }}
+        actionTitle={pendingSecAction?.title}
+        actionType={pendingSecAction?.type}
+      />
     </div>
   );
 };

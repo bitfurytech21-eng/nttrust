@@ -29,6 +29,7 @@ import { NorthernTrustLogo } from '../common/NorthernTrustLogo';
 import { IrsLogo } from '../common/IrsLogo';
 import { BankAccount, Transaction } from '../../types/banking';
 import { exportOfficialStatementPDF, exportTaxFormPDF } from '../../utils/exportUtils';
+import { ExportPrintSecurityModal } from '../common/ExportPrintSecurityModal';
 
 interface StatementTaxModalProps {
   isOpen: boolean;
@@ -138,12 +139,27 @@ export const StatementTaxModal: React.FC<StatementTaxModalProps> = ({
   const netCashFlow = totalCredits - totalDebits;
   const interestEarnedPeriod = activeAccount ? (activeAccount.balance * ((activeAccount.interestRateAPY || 2.5) / 100) / 12) : 158.40;
 
+  // Security Modal state for Export & Print Protection
+  const [secModalOpen, setSecModalOpen] = useState(false);
+  const [pendingSecAction, setPendingSecAction] = useState<{
+    fn: () => void;
+    title: string;
+    type: 'export' | 'print' | 'download';
+  } | null>(null);
+
+  const triggerProtectedAction = (fn: () => void, title: string, type: 'export' | 'print' | 'download' = 'export') => {
+    setPendingSecAction({ fn, title, type });
+    setSecModalOpen(true);
+  };
+
   const handlePrint = () => {
-    window.print();
+    triggerProtectedAction(() => {
+      window.print();
+    }, 'Print Official Statement / Tax Document', 'print');
   };
 
   // Real-time high-fidelity PDF Generation and Download Flow
-  const handleGenerateAndDownloadPdf = () => {
+  const executeGenerateAndDownloadPdf = () => {
     setIsGeneratingPdf(true);
     setPdfProgress(10);
     setPdfStepText(`Fetching cleared ledger records for ${activeAccount.name}...`);
@@ -296,22 +312,32 @@ export const StatementTaxModal: React.FC<StatementTaxModalProps> = ({
     }, 1200);
   };
 
-  const handleDownloadCSV = () => {
-    const headers = 'Date,Reference Number,Type,Description,Counterparty,Debits,Credits,Status\n';
-    const rows = accountTxs.map(t => {
-      const isDebit = t.type === 'withdrawal' || t.type === 'transfer_out' || t.type === 'bill_payment' || t.type === 'card_purchase' || t.type === 'fee';
-      const deb = isDebit ? t.amount.toFixed(2) : '';
-      const cred = !isDebit ? t.amount.toFixed(2) : '';
-      return `"${t.timestamp.slice(0, 10)}","${t.referenceNumber}","${t.type}","${t.description.replace(/"/g, '""')}","${t.counterparty.replace(/"/g, '""')}",${deb},${cred},"${t.status}"`;
-    }).join('\n');
+  const handleGenerateAndDownloadPdf = () => {
+    triggerProtectedAction(
+      executeGenerateAndDownloadPdf,
+      `Download Official PDF Document (${documentType.toUpperCase().replace(/_/g, ' ')})`,
+      'download'
+    );
+  };
 
-    const blob = new Blob([headers + rows], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `Northern_Trust_Statement_${activeAccount.accountNumber}_${new Date().toISOString().slice(0, 10)}.csv`;
-    link.click();
-    URL.revokeObjectURL(url);
+  const handleDownloadCSV = () => {
+    triggerProtectedAction(() => {
+      const headers = 'Date,Reference Number,Type,Description,Counterparty,Debits,Credits,Status\n';
+      const rows = accountTxs.map(t => {
+        const isDebit = t.type === 'withdrawal' || t.type === 'transfer_out' || t.type === 'bill_payment' || t.type === 'card_purchase' || t.type === 'fee';
+        const deb = isDebit ? t.amount.toFixed(2) : '';
+        const cred = !isDebit ? t.amount.toFixed(2) : '';
+        return `"${t.timestamp.slice(0, 10)}","${t.referenceNumber}","${t.type}","${t.description.replace(/"/g, '""')}","${t.counterparty.replace(/"/g, '""')}",${deb},${cred},"${t.status}"`;
+      }).join('\n');
+
+      const blob = new Blob([headers + rows], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `Northern_Trust_Statement_${activeAccount.accountNumber}_${new Date().toISOString().slice(0, 10)}.csv`;
+      link.click();
+      URL.revokeObjectURL(url);
+    }, 'Export Statement CSV Ledger', 'export');
   };
 
   const maskAccount = (accNum: string) => {
@@ -1077,6 +1103,23 @@ export const StatementTaxModal: React.FC<StatementTaxModalProps> = ({
 
         </div>
       </div>
+
+      <ExportPrintSecurityModal
+        isOpen={secModalOpen}
+        onClose={() => {
+          setSecModalOpen(false);
+          setPendingSecAction(null);
+        }}
+        onAuthorized={() => {
+          if (pendingSecAction) {
+            pendingSecAction.fn();
+          }
+          setSecModalOpen(false);
+          setPendingSecAction(null);
+        }}
+        actionTitle={pendingSecAction?.title}
+        actionType={pendingSecAction?.type}
+      />
     </div>
   );
 };
