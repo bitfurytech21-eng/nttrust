@@ -26,6 +26,9 @@ import {
   Globe2
 } from 'lucide-react';
 import { NorthernTrustLogo } from '../common/NorthernTrustLogo';
+import { NorthernTrustBranchLocator } from '../common/NorthernTrustBranchLocator';
+import { GoogleSheetsSyncModal } from './GoogleSheetsSyncModal';
+import { FileSpreadsheet } from 'lucide-react';
 
 export const ServicesView: React.FC = () => {
   const {
@@ -42,6 +45,7 @@ export const ServicesView: React.FC = () => {
   const [copiedField, setCopiedField] = useState<string | null>(null);
   const [selectedAccountForSlip, setSelectedAccountForSlip] = useState(accounts[0]?.id || '');
   const [isPayModalOpen, setIsPayModalOpen] = useState(false);
+  const [isGoogleSheetsModalOpen, setIsGoogleSheetsModalOpen] = useState(false);
 
   const activeAccount = accounts.find(a => a.id === selectedAccountForSlip) || accounts[0];
   const primaryCard = cards[0];
