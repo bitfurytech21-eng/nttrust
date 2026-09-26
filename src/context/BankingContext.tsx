@@ -1092,7 +1092,7 @@ export const BankingProvider: React.FC<{ children: ReactNode }> = ({ children })
       return { success: false, error: 'Please enter both your Account Number and Password.' };
     }
 
-    // Match against bank accounts or client profile
+    // Match against bank accounts or registered customer profiles
     const matchedAccount = accounts.find(a => 
       a.accountNumber.replace(/[\s\-_]/g, '') === cleanNumber ||
       (a.iban && a.iban.replace(/[\s\-_]/g, '').toLowerCase() === identifier) ||
@@ -1104,16 +1104,38 @@ export const BankingProvider: React.FC<{ children: ReactNode }> = ({ children })
       c.clientId.toLowerCase() === identifier || 
       c.id.toLowerCase() === identifier ||
       c.email.toLowerCase() === identifier ||
+      c.ssnLast4 === cleanNumber ||
+      (c.taxIdMasked && c.taxIdMasked.slice(-4) === cleanNumber) ||
       identifier.includes('jolie') ||
       identifier.includes('angelina') ||
-      cleanNumber === '882077771975'
+      cleanNumber === '882077771975' ||
+      cleanNumber === '882049102741'
     );
-    const isAdmin = identifier.includes('admin') || identifier.includes('ops') || identifier.includes('sarah');
+
+    const isAdmin = identifier.includes('admin') || identifier.includes('ops') || identifier.includes('sarah') || identifier.includes('jenkins');
+
+    // STRICT SECURITY GATE: Reject if account number / identifier does not match any registered account/customer record
+    if (!matchedAccount && !matchedCustomer && !isAdmin) {
+      logSecurityEvent('LOGIN_UNRECOGNIZED_ACCOUNT', 'LOGIN', 'FAILED', `Authentication rejected: Account Number / Identifier "${rawInput}" is not recognized in bank ledger.`, 45);
+      return { success: false, error: 'Invalid Account Number or Password. The credentials provided do not match any active client account in our clearing system.' };
+    }
+
+    // Password validation gate
+    if (password.trim().length < 4) {
+      logSecurityEvent('LOGIN_INVALID_PASSWORD', 'LOGIN', 'FAILED', `Authentication rejected for ${rawInput}: Password does not meet security requirements.`, 30);
+      return { success: false, error: 'Invalid Account Number or Password. Password must be at least 4 characters long.' };
+    }
+
     const matchedProfile = isAdmin 
       ? (allCustomers.find(c => c.role === 'admin') || INITIAL_ADMIN_PROFILE) 
-      : (matchedCustomer || allCustomers.find(c => c.role === 'client') || INITIAL_CLIENT_PROFILE);
+      : (matchedCustomer || (matchedAccount ? (allCustomers.find(c => c.role === 'client') || INITIAL_CLIENT_PROFILE) : null));
 
-    const accountLabel = matchedAccount ? `Account #${matchedAccount.accountNumber} (${matchedAccount.name})` : `Account #${rawInput}`;
+    if (!matchedProfile) {
+      logSecurityEvent('LOGIN_NO_PROFILE_RECORD', 'LOGIN', 'FAILED', `Authentication rejected: Customer profile lookup failed for ${rawInput}.`, 35);
+      return { success: false, error: 'Invalid Account Number or Password. No matching active customer profile found.' };
+    }
+
+    const accountLabel = matchedAccount ? `Account #${matchedAccount.accountNumber} (${matchedAccount.name})` : `Account #${rawInput} (${matchedProfile.fullName})`;
 
     setPendingUsername(rawInput);
     setRememberDeviceChecked(rememberDevice);
@@ -1130,7 +1152,7 @@ export const BankingProvider: React.FC<{ children: ReactNode }> = ({ children })
       logSecurityEvent('LOGIN_PASSWORD_ONLY', 'LOGIN', 'SUCCESS', `User session authenticated via ${accountLabel}.`, 25);
       return { success: true };
     }
-  }, [accounts, logSecurityEvent]);
+  }, [accounts, allCustomers, logSecurityEvent]);
 
   const verify2FA = useCallback((code: string, trustDevice: boolean) => {
     const cleanCode = code.trim();
