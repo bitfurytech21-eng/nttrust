@@ -23,6 +23,10 @@ googleProvider.addScope('https://www.googleapis.com/auth/user.phonenumbers.read'
 googleProvider.addScope('https://www.googleapis.com/auth/spreadsheets.readonly');
 googleProvider.addScope('https://www.googleapis.com/auth/gmail.readonly');
 googleProvider.addScope('https://www.googleapis.com/auth/calendar.readonly');
+googleProvider.addScope('https://www.googleapis.com/auth/presentations');
+googleProvider.addScope('https://www.googleapis.com/auth/presentations.readonly');
+googleProvider.addScope('https://www.googleapis.com/auth/drive.readonly');
+googleProvider.addScope('https://www.googleapis.com/auth/drive.file');
 
 // Enum & Error Info Interface
 export enum OperationType {

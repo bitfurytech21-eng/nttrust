@@ -28,7 +28,8 @@ import {
 import { NorthernTrustLogo } from '../common/NorthernTrustLogo';
 import { NorthernTrustBranchLocator } from '../common/NorthernTrustBranchLocator';
 import { GoogleSheetsSyncModal } from './GoogleSheetsSyncModal';
-import { FileSpreadsheet } from 'lucide-react';
+import { GoogleSlidesPresentationModal } from './GoogleSlidesPresentationModal';
+import { FileSpreadsheet, Presentation } from 'lucide-react';
 
 export const ServicesView: React.FC = () => {
   const {
@@ -46,6 +47,7 @@ export const ServicesView: React.FC = () => {
   const [selectedAccountForSlip, setSelectedAccountForSlip] = useState(accounts[0]?.id || '');
   const [isPayModalOpen, setIsPayModalOpen] = useState(false);
   const [isGoogleSheetsModalOpen, setIsGoogleSheetsModalOpen] = useState(false);
+  const [isGoogleSlidesModalOpen, setIsGoogleSlidesModalOpen] = useState(false);
 
   const activeAccount = accounts.find(a => a.id === selectedAccountForSlip) || accounts[0];
   const primaryCard = cards[0];
@@ -383,7 +385,33 @@ export const ServicesView: React.FC = () => {
             <ArrowRight className="w-4 h-4 stroke-[2.25]" />
           </button>
         </div>
+
+        {/* Service 10: Google Slides Presentation Decks */}
+        <div className="bg-white rounded-2xl border-2 border-[#D8DEE8] p-5 shadow-xs space-y-3 flex flex-col justify-between hover:border-[#147A52] transition-all">
+          <div className="space-y-2">
+            <div className="w-10 h-10 rounded-xl bg-amber-50 border-2 border-amber-200 text-amber-700 flex items-center justify-center">
+              <Presentation className="w-5 h-5 stroke-[2.25]" />
+            </div>
+            <h3 className="font-extrabold text-base text-[#20242A]">Google Slides Wealth Presentation Decks</h3>
+            <p className="text-xs text-[#5F6670] font-medium leading-relaxed">
+              Generate executive portfolio reviews, custody breakdowns, and strategic wealth decks directly inside your Google Drive.
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={() => setIsGoogleSlidesModalOpen(true)}
+            className="w-full py-2.5 px-4 rounded-xl bg-[#0B1F6A] hover:bg-[#081552] text-white font-bold text-xs flex items-center justify-center gap-2 transition-all cursor-pointer shadow-2xs"
+          >
+            <span>Launch Google Slides Center</span>
+            <ArrowRight className="w-4 h-4 stroke-[2.25]" />
+          </button>
+        </div>
       </div>
+
+      <GoogleSlidesPresentationModal
+        isOpen={isGoogleSlidesModalOpen}
+        onClose={() => setIsGoogleSlidesModalOpen(false)}
+      />
     </div>
   );
 };
