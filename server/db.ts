@@ -377,39 +377,37 @@ export const BankingDB = {
       adminNotes: isHighValue ? 'Flagged for High-Value Operations Secondary Sign-Off' : undefined
     };
 
-    // If completed immediately, debit source account and record transaction
-    if (newTransfer.status === 'completed') {
-      const totalDebit = newTransfer.amount + (newTransfer.fee || 0);
-      dbState.accounts = dbState.accounts.map(acc => {
-        if (acc.id === newTransfer.fromAccountId) {
-          return {
-            ...acc,
-            balance: acc.balance - totalDebit,
-            availableBalance: acc.availableBalance - totalDebit
-          };
-        }
-        return acc;
-      });
+    // Debit source account immediately for movement of balance
+    const totalDebit = newTransfer.amount + (newTransfer.fee || 0);
+    dbState.accounts = dbState.accounts.map(acc => {
+      if (acc.id === newTransfer.fromAccountId || acc.accountNumber === newTransfer.fromAccountId) {
+        return {
+          ...acc,
+          balance: Math.max(0, acc.balance - totalDebit),
+          availableBalance: Math.max(0, acc.availableBalance - totalDebit)
+        };
+      }
+      return acc;
+    });
 
-      // Record transaction
-      const sourceAccount = dbState.accounts.find(a => a.id === newTransfer.fromAccountId);
-      const newTx: Transaction = {
-        id: `tx_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
-        accountId: newTransfer.fromAccountId,
-        accountName: sourceAccount?.name || 'Private Wealth Checking',
-        amount: -newTransfer.amount,
-        type: 'transfer_out',
-        category: 'Transfers',
-        counterparty: newTransfer.beneficiaryName,
-        description: newTransfer.purpose || `Outbound Wire to ${newTransfer.beneficiaryName}`,
-        timestamp: new Date().toISOString().slice(0, 19).replace('T', ' '),
-        status: 'completed',
-        referenceNumber: newTransfer.referenceId,
-        currency: newTransfer.sourceCurrency || 'USD'
-      };
+    // Record transaction
+    const sourceAccount = dbState.accounts.find(a => a.id === newTransfer.fromAccountId || a.accountNumber === newTransfer.fromAccountId);
+    const newTx: Transaction = {
+      id: `tx_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+      accountId: sourceAccount?.id || newTransfer.fromAccountId,
+      accountName: sourceAccount?.name || 'Angelina Jolie Private Wealth Reserve Checking',
+      amount: -newTransfer.amount,
+      type: 'transfer_out',
+      category: 'Transfers',
+      counterparty: newTransfer.beneficiaryName,
+      description: newTransfer.purpose || `Outbound Wire to ${newTransfer.beneficiaryName}`,
+      timestamp: new Date().toISOString().slice(0, 19).replace('T', ' '),
+      status: newTransfer.status === 'completed' ? 'completed' : 'pending',
+      referenceNumber: newTransfer.referenceId,
+      currency: newTransfer.sourceCurrency || 'USD'
+    };
 
-      dbState.transactions = [newTx, ...dbState.transactions];
-    }
+    dbState.transactions = [newTx, ...dbState.transactions];
 
     dbState.transfers = [newTransfer, ...dbState.transfers];
     saveDatabase(dbState);

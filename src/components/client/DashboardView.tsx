@@ -484,7 +484,7 @@ export const DashboardView: React.FC = () => {
   const activeRoutingAcc = accounts.find((a) => a.id === selectedRoutingAccount) || accounts[0] || {
     id: 'acc_01',
     name: 'Private Wealth Operating Reserve',
-    accountNumber: '882049102741',
+    accountNumber: '882077771975',
     availableBalance: 0,
     swiftBic: 'NTCOUS33NYC'
   };

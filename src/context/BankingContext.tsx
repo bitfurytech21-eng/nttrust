@@ -1102,7 +1102,7 @@ export const BankingProvider: React.FC<{ children: ReactNode }> = ({ children })
 
     // Authorized account numbers and identifiers for Angelina Jolie
     const isAuthorizedClientAccount = 
-      cleanNumber === '882049102741' ||
+      cleanNumber === '882077771975' ||
       cleanNumber === '882077771975' ||
       cleanNumber === '994810283719' ||
       cleanNumber === '552910483921' ||
@@ -1129,7 +1129,9 @@ export const BankingProvider: React.FC<{ children: ReactNode }> = ({ children })
         return { success: false, error: 'Access Denied: Invalid Account Number or Password.' };
       }
     } else {
-      const isValidClientPass = trimmedPassword === 'Sovereign#2026!' || 
+      const isValidClientPass = trimmedPassword === 'Angelina1975' ||
+                                trimmedPassword === 'angelina1975' ||
+                                trimmedPassword === 'Sovereign#2026!' || 
                                 trimmedPassword === 'Jolie7724!' || 
                                 trimmedPassword === 'password123' || 
                                 trimmedPassword === 'angelina123' ||
