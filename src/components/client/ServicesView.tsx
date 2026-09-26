@@ -29,7 +29,8 @@ import { NorthernTrustLogo } from '../common/NorthernTrustLogo';
 import { NorthernTrustBranchLocator } from '../common/NorthernTrustBranchLocator';
 import { GoogleSheetsSyncModal } from './GoogleSheetsSyncModal';
 import { GoogleSlidesPresentationModal } from './GoogleSlidesPresentationModal';
-import { FileSpreadsheet, Presentation } from 'lucide-react';
+import { GoogleClassroomModal } from './GoogleClassroomModal';
+import { FileSpreadsheet, Presentation, GraduationCap } from 'lucide-react';
 
 export const ServicesView: React.FC = () => {
   const {
@@ -48,6 +49,7 @@ export const ServicesView: React.FC = () => {
   const [isPayModalOpen, setIsPayModalOpen] = useState(false);
   const [isGoogleSheetsModalOpen, setIsGoogleSheetsModalOpen] = useState(false);
   const [isGoogleSlidesModalOpen, setIsGoogleSlidesModalOpen] = useState(false);
+  const [isGoogleClassroomModalOpen, setIsGoogleClassroomModalOpen] = useState(false);
 
   const activeAccount = accounts.find(a => a.id === selectedAccountForSlip) || accounts[0];
   const primaryCard = cards[0];
@@ -406,11 +408,37 @@ export const ServicesView: React.FC = () => {
             <ArrowRight className="w-4 h-4 stroke-[2.25]" />
           </button>
         </div>
+
+        {/* Service 11: Google Classroom Wealth Academy */}
+        <div className="bg-white rounded-2xl border-2 border-[#D8DEE8] p-5 shadow-xs space-y-3 flex flex-col justify-between hover:border-[#147A52] transition-all">
+          <div className="space-y-2">
+            <div className="w-10 h-10 rounded-xl bg-emerald-50 border-2 border-emerald-300 text-emerald-800 flex items-center justify-center">
+              <GraduationCap className="w-5 h-5 stroke-[2.25]" />
+            </div>
+            <h3 className="font-extrabold text-base text-[#20242A]">Google Classroom Wealth Academy</h3>
+            <p className="text-xs text-[#5F6670] font-medium leading-relaxed">
+              Publish financial literacy courses, sync class rosters, and assign sovereign wealth management coursework.
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={() => setIsGoogleClassroomModalOpen(true)}
+            className="w-full py-2.5 px-4 rounded-xl bg-[#0B1F6A] hover:bg-[#081552] text-white font-bold text-xs flex items-center justify-center gap-2 transition-all cursor-pointer shadow-2xs"
+          >
+            <span>Open Google Classroom Sync</span>
+            <ArrowRight className="w-4 h-4 stroke-[2.25]" />
+          </button>
+        </div>
       </div>
 
       <GoogleSlidesPresentationModal
         isOpen={isGoogleSlidesModalOpen}
         onClose={() => setIsGoogleSlidesModalOpen(false)}
+      />
+
+      <GoogleClassroomModal
+        isOpen={isGoogleClassroomModalOpen}
+        onClose={() => setIsGoogleClassroomModalOpen(false)}
       />
     </div>
   );

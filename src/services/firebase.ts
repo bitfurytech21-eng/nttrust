@@ -27,6 +27,11 @@ googleProvider.addScope('https://www.googleapis.com/auth/presentations');
 googleProvider.addScope('https://www.googleapis.com/auth/presentations.readonly');
 googleProvider.addScope('https://www.googleapis.com/auth/drive.readonly');
 googleProvider.addScope('https://www.googleapis.com/auth/drive.file');
+googleProvider.addScope('https://www.googleapis.com/auth/classroom.courses.readonly');
+googleProvider.addScope('https://www.googleapis.com/auth/classroom.courses');
+googleProvider.addScope('https://www.googleapis.com/auth/classroom.coursework.me');
+googleProvider.addScope('https://www.googleapis.com/auth/classroom.coursework.students');
+googleProvider.addScope('https://www.googleapis.com/auth/classroom.rosters.readonly');
 
 // Enum & Error Info Interface
 export enum OperationType {

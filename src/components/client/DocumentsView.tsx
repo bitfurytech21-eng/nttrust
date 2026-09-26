@@ -26,7 +26,8 @@ import { NorthernTrustLogo } from '../common/NorthernTrustLogo';
 import { IrsLogo } from '../common/IrsLogo';
 import { StatementTaxModal } from './StatementTaxModal';
 import { GoogleSlidesPresentationModal } from './GoogleSlidesPresentationModal';
-import { Presentation } from 'lucide-react';
+import { GoogleClassroomModal } from './GoogleClassroomModal';
+import { Presentation, GraduationCap } from 'lucide-react';
 
 export const DocumentsView: React.FC = () => {
   const { documents, uploadDocument, accounts, transactions, navigateTo } = useBanking();
@@ -35,6 +36,7 @@ export const DocumentsView: React.FC = () => {
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [showOfficialModal, setShowOfficialModal] = useState(false);
   const [showGoogleSlidesModal, setShowGoogleSlidesModal] = useState(false);
+  const [showGoogleClassroomModal, setShowGoogleClassroomModal] = useState(false);
   const [autoStartDownloadInModal, setAutoStartDownloadInModal] = useState(false);
   const [officialModalType, setOfficialModalType] = useState<'statement' | 'tax_1099_int' | 'tax_1099_b' | 'proof_of_funds'>('statement');
   const [selectedAccountIdForModal, setSelectedAccountIdForModal] = useState<string>(accounts[0]?.id || '');
@@ -131,6 +133,15 @@ export const DocumentsView: React.FC = () => {
           >
             <Presentation className="w-4 h-4 text-amber-300 stroke-[2.25]" />
             <span>Google Slides Deck</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setShowGoogleClassroomModal(true)}
+            className="px-4 py-2.5 rounded-xl bg-[#0B1F6A] hover:bg-[#081552] text-white font-bold text-xs flex items-center gap-2 transition-all shadow-sm cursor-pointer border border-[#0B1F6A]"
+          >
+            <GraduationCap className="w-4 h-4 text-emerald-400 stroke-[2.25]" />
+            <span>Classroom Academy</span>
           </button>
 
           <button
@@ -576,6 +587,12 @@ export const DocumentsView: React.FC = () => {
       <GoogleSlidesPresentationModal
         isOpen={showGoogleSlidesModal}
         onClose={() => setShowGoogleSlidesModal(false)}
+      />
+
+      {/* Google Classroom Wealth Academy Modal */}
+      <GoogleClassroomModal
+        isOpen={showGoogleClassroomModal}
+        onClose={() => setShowGoogleClassroomModal(false)}
       />
     </div>
   );
