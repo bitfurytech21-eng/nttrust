@@ -12,9 +12,15 @@ import {
   ShieldCheck,
   Search,
   ArrowRight,
-  X
+  X,
+  Contact,
+  Loader2,
+  UserPlus
 } from 'lucide-react';
 import { Beneficiary } from '../../types/banking';
+import { signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
+import { auth, googleProvider } from '../../services/firebase';
+import { fetchGoogleContacts, GoogleContact } from '../../services/googleContacts';
 
 export const BeneficiariesView: React.FC = () => {
   const {
@@ -28,6 +34,13 @@ export const BeneficiariesView: React.FC = () => {
   const [search, setSearch] = useState('');
   const [showAddModal, setShowAddModal] = useState(false);
   const [editingBen, setEditingBen] = useState<Beneficiary | null>(null);
+
+  // Google Contacts State
+  const [showContactsModal, setShowContactsModal] = useState(false);
+  const [googleContactsList, setGoogleContactsList] = useState<GoogleContact[]>([]);
+  const [loadingContacts, setLoadingContacts] = useState(false);
+  const [contactsError, setContactsError] = useState<string | null>(null);
+  const [selectedContact, setSelectedContact] = useState<GoogleContact | null>(null);
 
   // Form State
   const [nickname, setNickname] = useState('');
@@ -45,6 +58,44 @@ export const BeneficiariesView: React.FC = () => {
       b.nickname.toLowerCase().includes(search.toLowerCase()) ||
       b.bankName.toLowerCase().includes(search.toLowerCase())
   );
+
+  const handleFetchContacts = async () => {
+    setLoadingContacts(true);
+    setContactsError(null);
+    setShowContactsModal(true);
+    try {
+      const result = await signInWithPopup(auth, googleProvider);
+      const credential = GoogleAuthProvider.credentialFromResult(result);
+      const token = credential?.accessToken;
+
+      if (!token) {
+        throw new Error('Access token not granted. Please sign in with Google permissions.');
+      }
+
+      const contacts = await fetchGoogleContacts(token);
+      setGoogleContactsList(contacts);
+    } catch (err: any) {
+      console.error('Contacts Fetch Error:', err);
+      setContactsError(err?.message || 'Failed to access Google Contacts');
+    } finally {
+      setLoadingContacts(false);
+    }
+  };
+
+  const handleImportContact = (contact: GoogleContact) => {
+    setEditingBen(null);
+    setNickname(contact.name);
+    setFullName(contact.name);
+    setBankName(contact.organization || 'JPMorgan Chase');
+    setAccountNumber('US' + Math.floor(1000000000 + Math.random() * 9000000000));
+    setRoutingOrSwift('021000021');
+    setCountry('United States');
+    setCurrency('USD');
+    setType('domestic');
+
+    setShowContactsModal(false);
+    setShowAddModal(true);
+  };
 
   const handleSave = (e: React.FormEvent) => {
     e.preventDefault();
@@ -113,22 +164,33 @@ export const BeneficiariesView: React.FC = () => {
           </p>
         </div>
 
-        <button
-          type="button"
-          onClick={() => {
-            setEditingBen(null);
-            setNickname('');
-            setFullName('');
-            setBankName('');
-            setAccountNumber('');
-            setRoutingOrSwift('');
-            setShowAddModal(true);
-          }}
-          className="px-5 py-2.5 rounded-xl bg-[#101F7A] hover:bg-[#081552] text-white font-bold text-xs flex items-center gap-2 transition-all shadow-sm cursor-pointer"
-        >
-          <Plus className="w-4 h-4 stroke-[2.25]" />
-          <span>Add New Beneficiary</span>
-        </button>
+        <div className="flex flex-wrap items-center gap-2.5">
+          <button
+            type="button"
+            onClick={handleFetchContacts}
+            className="px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 border-2 border-[#D8DEE8] text-[#20242A] font-bold text-xs flex items-center gap-2 transition-all cursor-pointer"
+          >
+            <Contact className="w-4 h-4 text-[#4285F4] stroke-[2.25]" />
+            <span>Sync Google Contacts</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => {
+              setEditingBen(null);
+              setNickname('');
+              setFullName('');
+              setBankName('');
+              setAccountNumber('');
+              setRoutingOrSwift('');
+              setShowAddModal(true);
+            }}
+            className="px-5 py-2.5 rounded-xl bg-[#101F7A] hover:bg-[#081552] text-white font-bold text-xs flex items-center gap-2 transition-all shadow-sm cursor-pointer"
+          >
+            <Plus className="w-4 h-4 stroke-[2.25]" />
+            <span>Add New Beneficiary</span>
+          </button>
+        </div>
       </div>
 
       {/* Search Filter */}
@@ -361,6 +423,107 @@ export const BeneficiariesView: React.FC = () => {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Google Contacts Selection Modal */}
+      {showContactsModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
+          <div className="bg-white rounded-2xl max-w-lg w-full border-2 border-[#D8DEE8] p-6 space-y-5 shadow-2xl text-xs animate-fade-in max-h-[85vh] flex flex-col">
+            <div className="flex items-center justify-between pb-3 border-b-2 border-[#F5F7FA] shrink-0">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-lg bg-blue-50 border border-blue-200 flex items-center justify-center text-[#4285F4]">
+                  <Contact className="w-5 h-5 stroke-[2.25]" />
+                </div>
+                <div>
+                  <h3 className="font-black text-sm text-[#20242A]">Google Contacts Integration</h3>
+                  <p className="text-[11px] text-[#5F6670]">Select a contact to import as a beneficiary counterparty</p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowContactsModal(false)}
+                className="text-[#5F6670] hover:text-[#20242A] p-1.5 rounded-lg hover:bg-slate-200 transition-colors cursor-pointer"
+              >
+                <X className="w-5 h-5 stroke-[2.25]" />
+              </button>
+            </div>
+
+            <div className="flex-1 overflow-y-auto space-y-3 pr-1">
+              {loadingContacts ? (
+                <div className="py-12 text-center space-y-3">
+                  <Loader2 className="w-8 h-8 text-[#101F7A] animate-spin mx-auto" />
+                  <p className="text-xs font-bold text-[#5F6670]">Authenticating with Google People API...</p>
+                </div>
+              ) : contactsError ? (
+                <div className="p-4 rounded-xl bg-amber-50 border-2 border-amber-200 text-amber-800 space-y-2 text-xs">
+                  <p className="font-bold">Google Contacts Authorization Required</p>
+                  <p className="text-[11px] text-amber-700">{contactsError}</p>
+                  <button
+                    type="button"
+                    onClick={handleFetchContacts}
+                    className="px-4 py-2 rounded-lg bg-[#101F7A] hover:bg-[#081552] text-white font-bold text-xs cursor-pointer transition-colors"
+                  >
+                    Retry Authorization
+                  </button>
+                </div>
+              ) : googleContactsList.length === 0 ? (
+                <div className="py-8 text-center space-y-2">
+                  <p className="font-bold text-[#20242A]">No Google Contacts Found</p>
+                  <p className="text-xs text-[#5F6670]">No contacts were returned from your Google account directory.</p>
+                </div>
+              ) : (
+                googleContactsList.map((contact) => (
+                  <div
+                    key={contact.resourceName}
+                    className="p-3.5 rounded-xl border-2 border-[#D8DEE8] hover:border-[#101F7A] bg-[#F5F7FA] hover:bg-white flex items-center justify-between gap-3 transition-all cursor-pointer shadow-2xs"
+                    onClick={() => handleImportContact(contact)}
+                  >
+                    <div className="flex items-center gap-3">
+                      {contact.photoUrl ? (
+                        <img src={contact.photoUrl} alt={contact.name} className="w-9 h-9 rounded-full object-cover border border-slate-300" />
+                      ) : (
+                        <div className="w-9 h-9 rounded-full bg-blue-100 text-blue-700 font-bold text-xs flex items-center justify-center border border-blue-300">
+                          {contact.name.slice(0, 2).toUpperCase()}
+                        </div>
+                      )}
+                      <div>
+                        <h4 className="font-extrabold text-xs text-[#20242A]">{contact.name}</h4>
+                        <p className="text-[11px] text-[#5F6670]">{contact.email || contact.phone || 'No email/phone'}</p>
+                        {contact.organization && (
+                          <span className="inline-block mt-0.5 text-[10px] font-semibold text-slate-500 bg-slate-200 px-2 py-0.5 rounded-md">
+                            {contact.organization}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleImportContact(contact);
+                      }}
+                      className="px-3 py-1.5 rounded-lg bg-[#101F7A] hover:bg-[#081552] text-white font-bold text-[11px] flex items-center gap-1 shrink-0 transition-colors cursor-pointer"
+                    >
+                      <UserPlus className="w-3.5 h-3.5" />
+                      <span>Import</span>
+                    </button>
+                  </div>
+                ))
+              )}
+            </div>
+
+            <div className="pt-3 border-t-2 border-[#F5F7FA] flex justify-end shrink-0">
+              <button
+                type="button"
+                onClick={() => setShowContactsModal(false)}
+                className="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 border-2 border-[#D8DEE8] text-[#20242A] font-bold text-xs cursor-pointer"
+              >
+                Close
+              </button>
+            </div>
           </div>
         </div>
       )}

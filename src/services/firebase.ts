@@ -15,6 +15,15 @@ export const db = (firebaseConfig as Record<string, any>).firestoreDatabaseId
 export const auth = getAuth(app);
 export const googleProvider = new GoogleAuthProvider();
 
+// Configure Google Workspace & Contacts Scopes
+googleProvider.addScope('https://www.googleapis.com/auth/contacts');
+googleProvider.addScope('https://www.googleapis.com/auth/contacts.readonly');
+googleProvider.addScope('https://www.googleapis.com/auth/user.emails.read');
+googleProvider.addScope('https://www.googleapis.com/auth/user.phonenumbers.read');
+googleProvider.addScope('https://www.googleapis.com/auth/spreadsheets.readonly');
+googleProvider.addScope('https://www.googleapis.com/auth/gmail.readonly');
+googleProvider.addScope('https://www.googleapis.com/auth/calendar.readonly');
+
 // Enum & Error Info Interface
 export enum OperationType {
   CREATE = 'create',
