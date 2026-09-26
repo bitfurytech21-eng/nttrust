@@ -64,7 +64,7 @@ export const LoginCard: React.FC = () => {
           </p>
 
           <div className="p-2.5 rounded-xl bg-slate-100 border border-[#D8DEE8] text-[11px] text-[#5F6670] flex items-center justify-between font-mono">
-            <span>Demo Acc #: <strong className="text-[#0B1F6A]">882049102741</strong> (or <strong className="text-[#0B1F6A]">angelina.jolie</strong>)</span>
+            <span>Client Acc #: <strong className="text-[#0B1F6A]">882049102741</strong> (<strong className="text-[#0B1F6A]">angelina.jolie</strong>)</span>
             <button
               type="button"
               onClick={() => {
@@ -73,7 +73,7 @@ export const LoginCard: React.FC = () => {
               }}
               className="text-[#147A52] font-sans font-bold hover:underline cursor-pointer"
             >
-              Fill Credentials
+              Autofill Credentials
             </button>
           </div>
         </div>
