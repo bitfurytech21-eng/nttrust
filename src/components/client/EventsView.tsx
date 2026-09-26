@@ -18,8 +18,17 @@ import {
   SendHorizontal,
   FileText,
   ShieldCheck,
-  ChevronRight
+  ChevronRight,
+  RefreshCw,
+  ExternalLink
 } from 'lucide-react';
+import {
+  signInWithGoogleCalendar,
+  getCachedCalendarAccessToken,
+  listCalendarEvents,
+  createCalendarEvent,
+  GoogleCalendarEvent
+} from '../../services/googleCalendar';
 
 export interface BankEvent {
   id: string;
@@ -102,6 +111,71 @@ export const EventsView: React.FC = () => {
   const [activeCategory, setActiveCategory] = useState<string>('all');
   const [showScheduleModal, setShowScheduleModal] = useState(false);
 
+  // Google Calendar Sync State
+  const [calendarToken, setCalendarToken] = useState<string | null>(getCachedCalendarAccessToken());
+  const [isSyncingCalendar, setIsSyncingCalendar] = useState(false);
+  const [syncSuccessMessage, setSyncSuccessMessage] = useState<string | null>(null);
+
+  const handleSyncGoogleCalendar = async () => {
+    setIsSyncingCalendar(true);
+    setSyncSuccessMessage(null);
+    try {
+      let token = calendarToken;
+      if (!token) {
+        token = await signInWithGoogleCalendar();
+        setCalendarToken(token);
+      }
+
+      const googleEvents = await listCalendarEvents('primary', token);
+
+      if (googleEvents.length > 0) {
+        const convertedGoogleEvents: BankEvent[] = googleEvents.map((gEvt) => {
+          const startDate = gEvt.start?.dateTime ? gEvt.start.dateTime.slice(0, 10) : (gEvt.start?.date || '2026-10-01');
+          const startTimeStr = gEvt.start?.dateTime
+            ? new Date(gEvt.start.dateTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+            : 'All Day';
+
+          return {
+            id: `g_evt_${gEvt.id}`,
+            title: gEvt.summary || 'Google Calendar Meeting',
+            category: 'advisory',
+            date: startDate,
+            time: startTimeStr,
+            duration: '60 mins',
+            location: gEvt.location || 'Google Calendar Meeting Room',
+            type: gEvt.location?.toLowerCase().includes('branch') ? 'branch' : 'virtual',
+            advisorName: gEvt.organizer?.displayName || gEvt.organizer?.email || 'Google Workspace Organizer',
+            advisorRole: 'Calendar Host',
+            status: 'confirmed',
+            description: gEvt.description || 'Synchronized event from Google Calendar.'
+          };
+        });
+
+        // Merge into events list ensuring no duplicate IDs
+        setEvents(prev => {
+          const existingIds = new Set(prev.map(p => p.id));
+          const newUnique = convertedGoogleEvents.filter(c => !existingIds.has(c.id));
+          return [...newUnique, ...prev];
+        });
+
+        setSyncSuccessMessage(`Synchronized ${convertedGoogleEvents.length} events from Google Calendar!`);
+        addNotification({
+          type: 'security',
+          title: 'Google Calendar Synchronized',
+          message: `Successfully loaded ${convertedGoogleEvents.length} upcoming events from your Google Calendar.`,
+          category: 'system'
+        });
+      } else {
+        setSyncSuccessMessage('Connected to Google Calendar. No upcoming events found.');
+      }
+    } catch (err: any) {
+      console.error('Google Calendar Sync Error:', err);
+      alert(`Google Calendar Sync Error: ${err?.message || 'Unable to sync'}`);
+    } finally {
+      setIsSyncingCalendar(false);
+    }
+  };
+
   // New Event Form State
   const [newTitle, setNewTaskTitle] = useState('Quarterly Wealth Review & Lombard Credit Line Consultation');
   const [newCategory, setNewCategory] = useState<'advisory' | 'wire' | 'tax' | 'branch'>('advisory');
@@ -115,7 +189,7 @@ export const EventsView: React.FC = () => {
     ? events
     : events.filter((e) => e.category === activeCategory);
 
-  const handleScheduleSubmit = (e: React.FormEvent) => {
+  const handleScheduleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newTitle) return;
 
@@ -135,6 +209,23 @@ export const EventsView: React.FC = () => {
     };
 
     setEvents(prev => [newEventItem, ...prev]);
+
+    // If connected to Google Calendar, sync the new event
+    if (calendarToken) {
+      try {
+        const startISO = new Date(`${newDate}T15:00:00Z`).toISOString();
+        const endISO = new Date(`${newDate}T16:00:00Z`).toISOString();
+        await createCalendarEvent({
+          summary: newTitle,
+          description: `${newDesc} (Assigned Advisor: ${newAdvisor})`,
+          location: newEventItem.location,
+          startDateTime: startISO,
+          endDateTime: endISO,
+        }, 'primary', calendarToken);
+      } catch (gErr) {
+        console.warn('Could not post event to Google Calendar:', gErr);
+      }
+    }
 
     addNotification({
       type: 'security',
@@ -188,7 +279,17 @@ export const EventsView: React.FC = () => {
           </p>
         </div>
 
-        <div className="flex items-center gap-3 shrink-0">
+        <div className="flex items-center gap-3 shrink-0 flex-wrap">
+          <button
+            type="button"
+            onClick={handleSyncGoogleCalendar}
+            disabled={isSyncingCalendar}
+            className="px-4.5 py-2.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 border-2 border-emerald-300 text-[#147A52] font-black text-xs flex items-center gap-2 transition-all shadow-2xs cursor-pointer"
+          >
+            <RefreshCw className={`w-4 h-4 ${isSyncingCalendar ? 'animate-spin' : ''}`} />
+            <span>{isSyncingCalendar ? 'Syncing Calendar...' : 'Sync Google Calendar'}</span>
+          </button>
+
           <button
             type="button"
             onClick={() => setShowScheduleModal(true)}
@@ -199,6 +300,22 @@ export const EventsView: React.FC = () => {
           </button>
         </div>
       </div>
+
+      {syncSuccessMessage && (
+        <div className="p-3.5 rounded-2xl bg-emerald-50 border-2 border-emerald-300 text-[#147A52] text-xs font-bold flex items-center justify-between shadow-2xs animate-fade-in">
+          <div className="flex items-center gap-2">
+            <CheckCircle2 className="w-4 h-4 text-[#147A52] stroke-[2.5]" />
+            <span>{syncSuccessMessage}</span>
+          </div>
+          <button
+            type="button"
+            onClick={() => setSyncSuccessMessage(null)}
+            className="text-[#147A52] hover:opacity-75"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+      )}
 
       {/* Category Filter Bar */}
       <div className="flex flex-wrap items-center justify-between gap-3 bg-[#F5F7FA] p-2 rounded-2xl border-2 border-[#D8DEE8]">
