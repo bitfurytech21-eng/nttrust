@@ -22,7 +22,7 @@ export const INITIAL_CLIENT_PROFILE: UserProfile = {
   preferredName: 'Angelina',
   email: 'a.jolie@joliepas.com',
   phone: '+1 (310) 555-7724',
-  avatarUrl: '',
+  avatarUrl: '/angelina_profile.jpg',
   role: 'client',
   tier: 'Tier 3 - Executive Sovereign Private Wealth',
   occupation: 'Filmmaker, Humanitarian & Special Envoy (Maddox Jolie-Pitt Foundation)',
