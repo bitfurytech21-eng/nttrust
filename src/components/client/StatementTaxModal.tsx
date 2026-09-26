@@ -51,7 +51,7 @@ export const StatementTaxModal: React.FC<StatementTaxModalProps> = ({
   const [documentType, setDocumentType] = useState<'statement' | 'tax_1099_int' | 'tax_1099_b' | 'proof_of_funds'>(initialType);
   const [selectedAccountId, setSelectedAccountId] = useState<string>(initialAccountId || accounts[0]?.id || '');
   const [period, setPeriod] = useState<string>('curr_month');
-  const [taxYear, setTaxYear] = useState<'2026' | '2025' | '2024' | '2023'>('2025');
+  const [taxYear, setTaxYear] = useState<'2026' | '2025' | '2024' | '2023'>('2026');
   const [isMasked, setIsMasked] = useState<boolean>(false);
   const [qrCodeUrl, setQrCodeUrl] = useState<string>('');
   
@@ -112,7 +112,7 @@ export const StatementTaxModal: React.FC<StatementTaxModalProps> = ({
   const accountTxs: Transaction[] = transactions.filter(t => t.accountId === activeAccount?.id);
 
   // Period label computation
-  let periodLabel = 'September 1, 2026 – September 24, 2026';
+  let periodLabel = 'September 1, 2026 – September 26, 2026';
   let statementCycle = 'Monthly Cycle #09-2026';
   if (period === 'prev_month') {
     periodLabel = 'August 1, 2026 – August 31, 2026';
@@ -124,7 +124,7 @@ export const StatementTaxModal: React.FC<StatementTaxModalProps> = ({
     periodLabel = 'January 1, 2025 – December 31, 2025';
     statementCycle = 'Annual Tax Cycle 2025';
   } else if (period === 'ytd_2026') {
-    periodLabel = 'January 1, 2026 – September 24, 2026';
+    periodLabel = 'January 1, 2026 – September 26, 2026';
     statementCycle = 'Year-to-Date Cycle 2026';
   }
 
@@ -1008,7 +1008,7 @@ export const StatementTaxModal: React.FC<StatementTaxModalProps> = ({
 
               {/* Date & Salutation */}
               <div className="font-sans space-y-1">
-                <p className="text-xs font-bold text-[#5F6670]">Date: March 31, 2026</p>
+                <p className="text-xs font-bold text-[#5F6670]">Date: September 26, 2026</p>
                 <p className="text-xs font-bold text-[#5F6670]">Reference Code: CERT-POF-2026-NT-CLIENT</p>
                 <div className="pt-3 font-bold text-sm text-[#20242A]">
                   TO WHOM IT MAY CONCERN / EMBASSY / FINANCIAL REGULATORY AUTHORITY:
@@ -1024,7 +1024,7 @@ export const StatementTaxModal: React.FC<StatementTaxModalProps> = ({
                 </p>
 
                 <p>
-                  We hereby certify that as of the close of global ledger operations on March 31, 2026, the above-named client maintains active, fully cleared, unencumbered depository balances and custodial reserves in excellent standing with Northern Trust Company as summarized below:
+                  We hereby certify that as of the close of global ledger operations on September 26, 2026, the above-named client maintains active, fully cleared, unencumbered depository balances and custodial reserves in excellent standing with Northern Trust Company as summarized below:
                 </p>
 
                 {/* Accounts Table in Letter */}

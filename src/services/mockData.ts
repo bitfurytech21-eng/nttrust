@@ -1004,47 +1004,36 @@ export const INITIAL_CARDS: BankCard[] = [
 export const INITIAL_DOCUMENTS: BankDocument[] = [
   // ----------------- 2026 STATEMENTS & TAX SUITE -----------------
   {
+    id: 'doc_2026_tax_03',
+    title: 'Q3 2026 Tax Year Assessment & Bitfury Inflow Withholding Advice',
+    type: 'tax',
+    category: 'tax',
+    date: '2026-09-26',
+    fileSize: '3.1 MB PDF',
+    period: 'Q3 2026 (Jul 01, 2026 - Sep 26, 2026)',
+    downloadUrl: '#tax-q3-2026',
+    isEncrypted: true
+  },
+  {
     id: 'doc_2026_sep_stmt',
-    title: 'September 2026 Northern Trust Client Statement (Bitfurytech ACH)',
+    title: 'September 2026 Northern Trust Client Statement (Bitfurytech Wire Settlement)',
     type: 'statement',
     category: 'statement',
-    date: '2026-09-24',
-    fileSize: '2.8 MB PDF',
-    period: 'Sep 01, 2026 - Sep 24, 2026',
+    date: '2026-09-26',
+    fileSize: '2.9 MB PDF',
+    period: 'Sep 01, 2026 - Sep 26, 2026',
     downloadUrl: '#statement-sep-2026',
     isEncrypted: true
   },
   {
-    id: 'doc_2026_01',
-    title: 'March 2026 Northern Trust Client Consolidated Statement',
-    type: 'statement',
-    category: 'statement',
-    date: '2026-03-31',
-    fileSize: '2.4 MB PDF',
-    period: 'Mar 01, 2026 - Mar 31, 2026',
-    downloadUrl: '#statement-mar-2026',
-    isEncrypted: true
-  },
-  {
-    id: 'doc_2026_02',
-    title: 'February 2026 Northern Trust Client Consolidated Statement',
-    type: 'statement',
-    category: 'statement',
-    date: '2026-02-28',
-    fileSize: '2.1 MB PDF',
-    period: 'Feb 01, 2026 - Feb 28, 2026',
-    downloadUrl: '#statement-feb-2026',
-    isEncrypted: true
-  },
-  {
-    id: 'doc_2026_03',
-    title: 'January 2026 Northern Trust Client Consolidated Statement',
-    type: 'statement',
-    category: 'statement',
-    date: '2026-01-31',
-    fileSize: '1.9 MB PDF',
-    period: 'Jan 01, 2026 - Jan 31, 2026',
-    downloadUrl: '#statement-jan-2026',
+    id: 'doc_2026_tax_02',
+    title: 'Q2 2026 Estimated Tax Liability Certificate & Institutional Clearance',
+    type: 'tax',
+    category: 'tax',
+    date: '2026-06-30',
+    fileSize: '1.8 MB PDF',
+    period: 'Q2 2026 (Apr 01, 2026 - Jun 30, 2026)',
+    downloadUrl: '#tax-q2-2026',
     isEncrypted: true
   },
   {
@@ -1054,7 +1043,7 @@ export const INITIAL_DOCUMENTS: BankDocument[] = [
     category: 'tax',
     date: '2026-03-31',
     fileSize: '1.4 MB PDF',
-    period: 'Q1 2026 (Jan - Mar 2026)',
+    period: 'Q1 2026 (Jan 01, 2026 - Mar 31, 2026)',
     downloadUrl: '#tax-q1-2026',
     isEncrypted: true
   },
