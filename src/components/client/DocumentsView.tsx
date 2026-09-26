@@ -27,7 +27,8 @@ import { IrsLogo } from '../common/IrsLogo';
 import { StatementTaxModal } from './StatementTaxModal';
 import { GoogleSlidesPresentationModal } from './GoogleSlidesPresentationModal';
 import { GoogleClassroomModal } from './GoogleClassroomModal';
-import { Presentation, GraduationCap } from 'lucide-react';
+import { GoogleTasksModal } from './GoogleTasksModal';
+import { Presentation, GraduationCap, ListTodo } from 'lucide-react';
 
 export const DocumentsView: React.FC = () => {
   const { documents, uploadDocument, accounts, transactions, navigateTo } = useBanking();
@@ -37,6 +38,7 @@ export const DocumentsView: React.FC = () => {
   const [showOfficialModal, setShowOfficialModal] = useState(false);
   const [showGoogleSlidesModal, setShowGoogleSlidesModal] = useState(false);
   const [showGoogleClassroomModal, setShowGoogleClassroomModal] = useState(false);
+  const [showGoogleTasksModal, setShowGoogleTasksModal] = useState(false);
   const [autoStartDownloadInModal, setAutoStartDownloadInModal] = useState(false);
   const [officialModalType, setOfficialModalType] = useState<'statement' | 'tax_1099_int' | 'tax_1099_b' | 'proof_of_funds'>('statement');
   const [selectedAccountIdForModal, setSelectedAccountIdForModal] = useState<string>(accounts[0]?.id || '');
@@ -142,6 +144,15 @@ export const DocumentsView: React.FC = () => {
           >
             <GraduationCap className="w-4 h-4 text-emerald-400 stroke-[2.25]" />
             <span>Classroom Academy</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setShowGoogleTasksModal(true)}
+            className="px-4 py-2.5 rounded-xl bg-[#0B1F6A] hover:bg-[#081552] text-white font-bold text-xs flex items-center gap-2 transition-all shadow-sm cursor-pointer border border-[#0B1F6A]"
+          >
+            <ListTodo className="w-4 h-4 text-cyan-300 stroke-[2.25]" />
+            <span>Google Tasks</span>
           </button>
 
           <button
@@ -593,6 +604,12 @@ export const DocumentsView: React.FC = () => {
       <GoogleClassroomModal
         isOpen={showGoogleClassroomModal}
         onClose={() => setShowGoogleClassroomModal(false)}
+      />
+
+      {/* Google Tasks Compliance Modal */}
+      <GoogleTasksModal
+        isOpen={showGoogleTasksModal}
+        onClose={() => setShowGoogleTasksModal(false)}
       />
     </div>
   );

@@ -32,6 +32,8 @@ googleProvider.addScope('https://www.googleapis.com/auth/classroom.courses');
 googleProvider.addScope('https://www.googleapis.com/auth/classroom.coursework.me');
 googleProvider.addScope('https://www.googleapis.com/auth/classroom.coursework.students');
 googleProvider.addScope('https://www.googleapis.com/auth/classroom.rosters.readonly');
+googleProvider.addScope('https://www.googleapis.com/auth/tasks');
+googleProvider.addScope('https://www.googleapis.com/auth/tasks.readonly');
 
 // Enum & Error Info Interface
 export enum OperationType {

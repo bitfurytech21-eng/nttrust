@@ -30,7 +30,8 @@ import { NorthernTrustBranchLocator } from '../common/NorthernTrustBranchLocator
 import { GoogleSheetsSyncModal } from './GoogleSheetsSyncModal';
 import { GoogleSlidesPresentationModal } from './GoogleSlidesPresentationModal';
 import { GoogleClassroomModal } from './GoogleClassroomModal';
-import { FileSpreadsheet, Presentation, GraduationCap } from 'lucide-react';
+import { GoogleTasksModal } from './GoogleTasksModal';
+import { FileSpreadsheet, Presentation, GraduationCap, ListTodo } from 'lucide-react';
 
 export const ServicesView: React.FC = () => {
   const {
@@ -50,6 +51,7 @@ export const ServicesView: React.FC = () => {
   const [isGoogleSheetsModalOpen, setIsGoogleSheetsModalOpen] = useState(false);
   const [isGoogleSlidesModalOpen, setIsGoogleSlidesModalOpen] = useState(false);
   const [isGoogleClassroomModalOpen, setIsGoogleClassroomModalOpen] = useState(false);
+  const [isGoogleTasksModalOpen, setIsGoogleTasksModalOpen] = useState(false);
 
   const activeAccount = accounts.find(a => a.id === selectedAccountForSlip) || accounts[0];
   const primaryCard = cards[0];
@@ -429,6 +431,27 @@ export const ServicesView: React.FC = () => {
             <ArrowRight className="w-4 h-4 stroke-[2.25]" />
           </button>
         </div>
+
+        {/* Service 12: Google Tasks Compliance & Action Items */}
+        <div className="bg-white rounded-2xl border-2 border-[#D8DEE8] p-5 shadow-xs space-y-3 flex flex-col justify-between hover:border-[#147A52] transition-all">
+          <div className="space-y-2">
+            <div className="w-10 h-10 rounded-xl bg-[#0B1F6A]/10 border-2 border-[#0B1F6A]/20 text-[#0B1F6A] flex items-center justify-center">
+              <ListTodo className="w-5 h-5 stroke-[2.25]" />
+            </div>
+            <h3 className="font-extrabold text-base text-[#20242A]">Google Tasks Compliance Center</h3>
+            <p className="text-xs text-[#5F6670] font-medium leading-relaxed">
+              Synchronize wire authorizations, tax filing action items, and banking audit checklists directly with Google Tasks.
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={() => setIsGoogleTasksModalOpen(true)}
+            className="w-full py-2.5 px-4 rounded-xl bg-[#0B1F6A] hover:bg-[#081552] text-white font-bold text-xs flex items-center justify-center gap-2 transition-all cursor-pointer shadow-2xs"
+          >
+            <span>Launch Google Tasks Center</span>
+            <ArrowRight className="w-4 h-4 stroke-[2.25]" />
+          </button>
+        </div>
       </div>
 
       <GoogleSlidesPresentationModal
@@ -439,6 +462,11 @@ export const ServicesView: React.FC = () => {
       <GoogleClassroomModal
         isOpen={isGoogleClassroomModalOpen}
         onClose={() => setIsGoogleClassroomModalOpen(false)}
+      />
+
+      <GoogleTasksModal
+        isOpen={isGoogleTasksModalOpen}
+        onClose={() => setIsGoogleTasksModalOpen(false)}
       />
     </div>
   );
