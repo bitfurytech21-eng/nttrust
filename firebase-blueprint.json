@@ -1,0 +1,86 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "User account profile and authentication details.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "clientId": { "type": "string" },
+        "fullName": { "type": "string" },
+        "email": { "type": "string" },
+        "role": { "type": "string" },
+        "tier": { "type": "string" },
+        "taxIdMasked": { "type": "string" }
+      },
+      "required": ["id", "clientId", "fullName", "email", "role"]
+    },
+    "BankAccount": {
+      "title": "BankAccount",
+      "description": "Customer financial depository or custodial account.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "accountNumber": { "type": "string" },
+        "routingNumber": { "type": "string" },
+        "currency": { "type": "string" },
+        "balance": { "type": "number" },
+        "availableBalance": { "type": "number" },
+        "type": { "type": "string" },
+        "status": { "type": "string" }
+      },
+      "required": ["id", "name", "accountNumber", "balance", "type"]
+    },
+    "Transaction": {
+      "title": "Transaction",
+      "description": "Financial ledger debit, credit, or wire entry.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "accountId": { "type": "string" },
+        "type": { "type": "string" },
+        "amount": { "type": "number" },
+        "description": { "type": "string" },
+        "date": { "type": "string" },
+        "status": { "type": "string" },
+        "referenceNumber": { "type": "string" }
+      },
+      "required": ["id", "accountId", "type", "amount", "date", "status"]
+    },
+    "TaxRecord": {
+      "title": "TaxRecord",
+      "description": "Official tax withholding, settlement, or clearing record.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "referenceNumber": { "type": "string" },
+        "date": { "type": "string" },
+        "taxYear": { "type": "string" },
+        "taxType": { "type": "string" },
+        "taxAmount": { "type": "number" },
+        "status": { "type": "string" },
+        "relatedAccountId": { "type": "string" }
+      },
+      "required": ["id", "referenceNumber", "date", "taxYear", "taxAmount", "status"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": { "$ref": "#/entities/UserProfile" },
+      "description": "User profile collection."
+    },
+    "/accounts/{accountId}": {
+      "schema": { "$ref": "#/entities/BankAccount" },
+      "description": "Bank account collection."
+    },
+    "/transactions/{transactionId}": {
+      "schema": { "$ref": "#/entities/Transaction" },
+      "description": "Transaction ledger collection."
+    },
+    "/tax_records/{taxRecordId}": {
+      "schema": { "$ref": "#/entities/TaxRecord" },
+      "description": "Tax records collection."
+    }
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "name": "Northern Trust - Private Client & Operations Portal",
+  "description": "Enterprise-grade online banking and operations portal featuring multi-factor authentication, account management, wire transfers, card controls, and administrative compliance tools.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
+

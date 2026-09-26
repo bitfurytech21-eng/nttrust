@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 400" fill="none">
+  <!-- Ring at Top -->
+  <circle cx="150" cy="52" r="34" stroke="#0b663b" stroke-width="13" />
+
+  <!-- Horizontal Crossbar (Stock) -->
+  <line x1="42" y1="94" x2="258" y2="94" stroke="#0b663b" stroke-width="13" stroke-linecap="square" />
+
+  <!-- Vertical Shank Upper (below ring to diagonal gap) -->
+  <line x1="150" y1="88" x2="150" y2="162" stroke="#0b663b" stroke-width="13" stroke-linecap="square" />
+
+  <!-- Vertical Shank Lower (from below diagonal down into fluke crown) -->
+  <line x1="150" y1="236" x2="150" y2="365" stroke="#0b663b" stroke-width="13" stroke-linecap="square" />
+
+  <!-- Letter N: Left Vertical Stem with classical serifs -->
+  <path d="M62,122 L112,122 L112,135 L96,135 L96,258 L124,258 L124,271 L62,271 L62,258 L82,258 L82,135 L62,135 Z" fill="#0b663b" />
+
+  <!-- Letter N: Diagonal Stroke cutting down across the shank -->
+  <polygon points="96,135 119,135 224,271 198,271" fill="#0b663b" />
+
+  <!-- Letter T: Seriffed crossbar and vertical leg -->
+  <path d="M182,122 L244,122 L244,138 L236,138 L236,133 L220,133 L220,208 L206,208 L206,133 L190,133 L190,138 L182,138 Z" fill="#0b663b" />
+
+  <!-- Bottom Fluke Arms (curved anchor bottom with sharp tips) -->
+  <path d="M10,205 C14,285 70,358 150,358 C230,358 286,285 290,205 L278,212 C274,280 220,346 150,346 C80,346 26,280 22,212 Z" fill="#0b663b" />
+
+  <!-- Bottom Crown Chevron Point -->
+  <path d="M150,398 L126,354 L142,354 L150,372 L158,354 L174,354 Z" fill="#0b663b" />
+</svg>
