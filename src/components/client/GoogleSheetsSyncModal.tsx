@@ -111,7 +111,7 @@ export const GoogleSheetsSyncModal: React.FC<GoogleSheetsSyncModalProps> = ({ is
       type: 'security',
       title: 'Google Sheets Data Import Completed',
       message: `Successfully synchronized ${sheetRows?.length || 0} rows from "${spreadsheetData?.title || 'Spreadsheet'}" into Northern Trust compliance vault.`,
-      category: 'compliance'
+      category: 'system'
     });
     setTimeout(() => {
       setImportSuccess(false);
