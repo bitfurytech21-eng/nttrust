@@ -136,9 +136,9 @@ export const INITIAL_ACCOUNTS: BankAccount[] = [
     name: 'Angelina Jolie Private Wealth Reserve Checking',
     type: 'checking',
     currency: 'USD',
-    balance: 2008654.00,
-    availableBalance: 2008654.00,
-    pendingBalance: 378899.00,
+    balance: 2506699.00,
+    availableBalance: 2506699.00,
+    pendingBalance: 0.00,
     interestRateAPY: 2.15,
     monthlyLimit: 5000000.00,
     monthlySpent: 0.00,
@@ -216,15 +216,25 @@ export const INITIAL_ACCOUNTS: BankAccount[] = [
 
 // =========================================================================
 // 3-YEAR TRANSACTION LEDGER (2023 - SEPTEMBER 2026)
-// Featuring Bitfurytech Holdings ACH Transactions:
-// - 3 Transactions 3 Years Ago (2023) from Bitfurytech Holdings
-// - 2 Transactions Last Year (2025) from Bitfurytech Holdings
-// - September 16, 2026: +$9,646 (ACH from Bitfurytech Holdings)
-// - September 23, 2026: +$997,863, +$396,645, +$600,000 (ACH from Bitfurytech Holdings)
-// - September 23, 2026 Pending: $378,899 (ACH from Bitfurytech Holdings)
 // =========================================================================
 export const INITIAL_TRANSACTIONS: Transaction[] = [
-  // ----------------------- SEPTEMBER 2026 CURRENT ACH TRANSACTIONS -----------------------
+  {
+    id: 'tx_2026_sep26_bitfury_01',
+    accountId: 'acc_chk_01',
+    accountName: 'Angelina Jolie Private Wealth Reserve Checking',
+    type: 'deposit',
+    amount: 498045.00,
+    currency: 'USD',
+    counterparty: 'Bitfurytech Holdings',
+    counterpartyAccount: 'ACH-BITFURY-HOLDINGS-910',
+    category: 'Income',
+    description: 'Bitfury Inbound Settlement - Approved Corporate Wire Transfer',
+    referenceNumber: 'WIRE-BITFURY-2026-0926-498045',
+    timestamp: '2026-09-26 15:45:00',
+    status: 'completed',
+    fee: 0.00,
+    location: 'Wilmington, DE'
+  },
   {
     id: 'tx_2026_sep23_04',
     accountId: 'acc_chk_01',
@@ -235,10 +245,10 @@ export const INITIAL_TRANSACTIONS: Transaction[] = [
     counterparty: 'Bitfurytech Holdings',
     counterpartyAccount: 'ACH-BITFURY-HOLDINGS-910',
     category: 'Income',
-    description: 'ACH Pending Inbound Transfer - Bitfurytech Holdings Clearing Settlement',
+    description: 'ACH Wire Transfer - REJECTED / DECLINED BY COMPLIANCE (Bitfurytech Holdings)',
     referenceNumber: 'ACH-TX-2026-0923-378899',
     timestamp: '2026-09-23 16:50:00',
-    status: 'pending',
+    status: 'rejected',
     fee: 0.00,
     location: 'Wilmington, DE'
   },
