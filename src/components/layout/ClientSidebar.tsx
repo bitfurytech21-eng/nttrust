@@ -17,7 +17,8 @@ import {
   Layers,
   CheckSquare,
   Globe2,
-  Landmark
+  Landmark,
+  Calendar
 } from 'lucide-react';
 
 export const ClientSidebar: React.FC = () => {
@@ -32,6 +33,7 @@ export const ClientSidebar: React.FC = () => {
   const mainNavItems = [
     { label: 'Dashboard', route: '/dashboard', icon: LayoutDashboard },
     { label: 'Banking & Services', route: '/services', icon: Layers },
+    { label: 'Events & Meetings', route: '/events', icon: Calendar },
     { label: 'Accounts', route: '/accounts', icon: Wallet },
     {
       label: 'Transfers & Wires',

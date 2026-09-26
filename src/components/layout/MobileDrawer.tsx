@@ -22,6 +22,7 @@ import {
   CheckSquare,
   Globe2,
   Landmark,
+  Calendar,
   LucideIcon
 } from 'lucide-react';
 
@@ -66,6 +67,7 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({ isOpen, onClose }) =
   const primaryNav: DrawerNavItem[] = [
     { label: 'Client Dashboard', route: '/dashboard', icon: LayoutDashboard },
     { label: 'Banking & Custody Services', route: '/services', icon: Layers },
+    { label: 'Events & Bank Appointments', route: '/events', icon: Calendar },
     { label: 'Deposit & Custody Accounts', route: '/accounts', icon: Wallet },
     {
       label: 'Domestic & Global Wires',

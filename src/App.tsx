@@ -41,6 +41,7 @@ import { CheckServicesView } from './components/client/CheckServicesView';
 import { FxExchangeView } from './components/client/FxExchangeView';
 import { LendingView } from './components/client/LendingView';
 import { TaxDashboardView } from './components/client/TaxDashboardView';
+import { EventsView } from './components/client/EventsView';
 
 // Admin Views
 import { AdminLoginView } from './components/admin/AdminLoginView';
@@ -235,6 +236,7 @@ const BankingAppInner: React.FC = () => {
                 {(currentRoute === '/checks' || currentRoute.startsWith('/checks')) && <CheckServicesView />}
                 {(currentRoute === '/fx' || currentRoute.startsWith('/fx')) && <FxExchangeView />}
                 {(currentRoute === '/lending' || currentRoute.startsWith('/lending') || currentRoute === '/credit') && <LendingView />}
+                {(currentRoute === '/events' || currentRoute === '/meetings' || currentRoute === '/calendar') && <EventsView />}
               </>
             )}
           </div>
